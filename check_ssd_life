@@ -107,7 +107,7 @@ else
             DEVICES=$( /sbin/camcontrol devlist | /usr/bin/sed -Ee 's/.*[(,](a*da[0-9]{1,3}).*/\/dev\/\1/' )
             ;;
         *)
-            DEVICES=$( awk '$4~/^\wd\w$/{print "/dev/"$4}' /proc/partitions )
+            DEVICES=$( ls /sys/block/|awk '$1~/^\wd\w/{print "/dev/"$1}' )
             ;;
     esac
 fi
