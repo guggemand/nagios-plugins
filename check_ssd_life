@@ -26,6 +26,7 @@ PROGNAME=`basename $0`
 VERSION="0.1"
 AUTHOR="Ryo Kuroda <lamanotrama@gmail.com>"
 export PATH=$PATH:/sbin:/usr/sbin/:/usr/local/bin:/usr/local/sbin
+OS=$( uname -s )
 
 # Exit codes
 STATE_OK=0
@@ -100,7 +101,14 @@ CRITICAL_THRESHOLD="${CRITICAL_THRESHOLD%\%}"
 if [ $# -gt 0 ];then
     DEVICES="$1"
 else
-    DEVICES=$( awk '$4~/^\wd\w$/{print "/dev/"$4}' /proc/partitions )
+    case "$OS" in
+        FreeBSD)
+            DEVICES=$( /sbin/camcontrol devlist | /usr/bin/sed -Ee 's/.*[(,](a*da[0-9]{1,3}).*/\/dev\/\1/' )
+            ;;
+        *)
+            DEVICES=$( awk '$4~/^\wd\w$/{print "/dev/"$4}' /proc/partitions )
+            ;;
+    esac
 fi
 
 SMARTCTL=$( which smartctl )
